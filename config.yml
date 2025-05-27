@@ -1,0 +1,12 @@
+---
+regions:   # nuke 실행 리전 기입
+#- "global" # global 리소스 전용 
+- "ap-northwest-1"
+
+account-blocklist: # nuke 블랙리스트 AWS ID
+- 1234567890
+
+# nuke 진행할 AWS ID
+accounts:        
+  574205320701:
+ 
