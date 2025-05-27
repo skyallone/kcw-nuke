@@ -1,0 +1,38 @@
+# GitHub workflow runing every night at 2am
+name: Run aws-nuke
+on:
+  push:
+    branches: [ main ]
+  # schedule:
+    # - cron:  '0 2 * * *'
+
+  # Specify workflow_dispatch to allow manual run
+  # See https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow
+  workflow_dispatch:
+
+jobs:
+  aws_nuke:
+    runs-on: ubuntu-latest
+    # Use aws-nuke official DOcker image with root user
+    container:
+      image: quay.io/rebuy/aws-nuke:v2.16.0
+      options: --user root
+    steps:
+    # Checkout your repository and setup AWS credentials
+    - name: checkout repo
+      uses: actions/checkout@v2
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        # These secrets should be configured on your repository
+        # Settings > Secrets > Actions
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-2
+
+    # Run aws-nuke
+    # Use --force --no-dry-run and --force-sleep
+    # to prevent aws-nuke confirmation prompt
+    - name: run aws-nuke
+      run: |-
+        aws-nuke -c config.yml --force --no-dry-run --force-sleep 3
